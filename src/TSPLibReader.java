@@ -6,10 +6,28 @@ public class TSPLibReader {
 
     // Reads a TSPLIB file with NODE_COORD_SECTION format
     public static double[][] readCoordinates(String filename) {
-        double[][] coords = new double[52][2];
+        int dimension = 0;
+
         try {
             BufferedReader br = new BufferedReader(new FileReader(filename));
             String line;
+
+            // first scan → find DIMENSION
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+
+                if (line.startsWith("DIMENSION")) {
+                    String[] parts = line.split(":");
+                    dimension = Integer.parseInt(parts[1].trim());
+                    break;
+                }
+            }
+            br.close();
+
+            double[][] coords = new double[dimension][2];
+
+            // second scan → read coordinates
+            br = new BufferedReader(new FileReader(filename));
             boolean coordSection = false;
             int index = 0;
 
@@ -34,9 +52,13 @@ public class TSPLibReader {
             }
             br.close();
 
-        } catch (IOException e) {
-            System.out.println("Error reading TSPLIB file: " + e.getMessage());
+            return coords;
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return coords;
+
+        return null;
     }
+
 }
